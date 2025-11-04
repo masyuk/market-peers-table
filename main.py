@@ -4,6 +4,8 @@ import altair as alt
 import streamlit as st
 
 def main():
+    st.set_page_config(page_title="Peer Finder")
+
     col1, col2 = st.columns(2)
     col1.text_input("Enter your ticker", key="ticker", on_change=_run_after_enter)
     col2.number_input("Enter depth", min_value=1, max_value=50, value=20, step=5, on_change=_run_after_enter, key="dept")
