@@ -6,12 +6,19 @@ import streamlit as st
 def main():
     st.set_page_config(page_title="Peer Finder")
 
-    col1, col2 = st.columns(2)
-    col1.text_input("Enter your ticker", key="ticker", on_change=_run_after_enter)
-    col2.number_input("Enter depth", min_value=1, max_value=50, value=20, step=5, on_change=_run_after_enter, key="dept")
+    c1, c2, c3 = st.columns(3)
+    c1.text_input("Enter your ticker", key="ticker", on_change=_run_after_enter)
+    c2.number_input("Enter depth", min_value=1, max_value=50, value=20, step=5, on_change=_run_after_enter, key="dept")
+    c3.selectbox("Data source", [
+        "v0.1.0: All fields", 
+        "v0.1.0: All fields (+etf)",
+        "v0.1.1: Description only", 
+        "v0.1.2: No description",
+        "v0.2.0: All fields", 
+        "v0.2.1: Description only"
+    ], key="data_source", on_change=_run_after_enter)
 
     final_df = st.session_state.get("final_df")
-    chart = st.session_state.get("final_chart")
 
     if isinstance(final_df, pd.DataFrame):
         rows = len(final_df)
@@ -24,46 +31,61 @@ def main():
 def _run_after_enter():
     ticker = (st.session_state.get("ticker") or "").strip().upper()
     dept = int(st.session_state.get("dept", 20))
+    data_source = st.session_state.get("data_source")
 
     # clear previous outputs until we succeed
     st.session_state.pop("final_df", None)
-    st.session_state.pop("final_chart", None)
 
     if not ticker:
         st.info("Please enter a ticker and press Enter.")
         return
 
-    # --- load data ---
+    # --- load data ---  
     try:
-        pearson = pd.read_parquet('./data/pirson_corr.parquet', engine='pyarrow')
+        match data_source:
+            case "v0.1.0: All fields":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_1_0-stock.parquet', engine='pyarrow')
+            case "v0.1.0: All fields (+etf)":
+                pearson = pd.read_parquet('./data/pirson_all.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_all.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_1_0-all.parquet', engine='pyarrow')
+            case "v0.1.1: Description only":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_1_1-stock.parquet', engine='pyarrow')
+            case "v0.1.2: No description":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_1_2-stock.parquet', engine='pyarrow')
+            case "v0.2.0: All fields":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_2_0-stock.parquet', engine='pyarrow')
+            case "v0.2.1: Description only":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_2_1-stock.parquet', engine='pyarrow')
+            case _:
+                st.error(f"Unknown data_source: {data_source}")
+                return
     except Exception as e:
         st.error(f"Failed to load Pearson file: {e}")
         return
-
-    try:
-        tdf = pd.read_parquet('./data/tickers.parquet', engine='pyarrow')
-    except Exception as e:
-        st.error(f"Failed to load tickers file: {e}")
-        return
-
-    try:
-        distance = pd.read_parquet('./data/cosin_dist.parquet', engine='pyarrow')
-    except Exception as e:
-        st.error(f"Failed to load cosine distance file: {e}")
-        return
     
     # ensure we have a 1D tickers Series
-    if isinstance(tdf, pd.DataFrame):
-        if 'ticker' in tdf.columns:
-            tickers = tdf['ticker']
-        elif tdf.shape[1] == 1:
-            tickers = tdf.iloc[:, 0]
+    if isinstance(sorter, pd.DataFrame):
+        if 'ticker' in sorter.columns:
+            tickers = sorter['ticker']
+        elif sorter.shape[1] == 1:
+            tickers = sorter.iloc[:, 0]
             tickers.name = 'ticker'
         else:
             st.error("Tickers parquet must have a 'ticker' column or a single column.")
             return
     else:
-        tickers = pd.Series(tdf, name='ticker')
+        tickers = pd.Series(sorter, name='ticker')
 
     tickers = tickers.reset_index(drop=True)
 
