@@ -15,7 +15,10 @@ def main():
         "v0.1.1: Description only", 
         "v0.1.2: No description",
         "v0.2.0: All fields", 
-        "v0.2.1: Description only"
+        "v0.2.1: Description only",
+        "v0.2.2: No description",
+        "v0.2.3: Gaps only",
+        "v0.2.4: No gap, No Desc."
     ], key="data_source", on_change=_run_after_enter)
 
     final_df = st.session_state.get("final_df")
@@ -67,6 +70,18 @@ def _run_after_enter():
                 pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
                 distance = pd.read_parquet('./data/v0_2_1-stock.parquet', engine='pyarrow')
+            case "v0.2.2: No description":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_2_2-stock.parquet', engine='pyarrow')
+            case "v0.2.3: Gaps only":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_2_3-stock.parquet', engine='pyarrow')
+            case "v0.2.4: No gap, No Desc.":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_2_4-stock.parquet', engine='pyarrow')
             case _:
                 st.error(f"Unknown data_source: {data_source}")
                 return
