@@ -6,10 +6,10 @@ import streamlit as st
 def main():
     st.set_page_config(page_title="Peer Finder")
 
-    c1, c2, c3 = st.columns(3)
-    c1.text_input("Enter your ticker", key="ticker", on_change=_run_after_enter)
-    c2.number_input("Enter depth", min_value=1, max_value=50, value=20, step=5, on_change=_run_after_enter, key="dept")
-    c3.selectbox("Data source", [
+    p1, p2, p3 = st.columns(3)
+    p1.text_input("Enter your ticker", key="ticker", on_change=_run_after_enter)
+    p2.number_input("Enter depth", min_value=1, max_value=50, value=20, step=5, on_change=_run_after_enter, key="dept")
+    p3.selectbox("Data source", [
         "v0.1.0: All fields", 
         "v0.1.0: All fields (+etf)",
         "v0.1.1: Description only", 
@@ -18,8 +18,15 @@ def main():
         "v0.2.1: Description only",
         "v0.2.2: No description",
         "v0.2.3: Gaps only",
-        "v0.2.4: No gap, No Desc."
+        "v0.2.4: No gap, No Desc.",
+        "v0.3.0: Customizable"
     ], key="data_source", on_change=_run_after_enter)
+    
+    if st.session_state.get("data_source") == "v0.3.0: Customizable":
+        c1, c2, c3 = st.columns(3)
+        c1.slider("Weight of gaps",         0, 100, 33, step=1, key="w_gaps", on_change=_run_after_enter)
+        c2.slider("Weight of indicators",   0, 100, 33, step=1, key="w_inds", on_change=_run_after_enter)
+        c3.slider("Weight of description",  0, 100, 33, step=1, key="w_desc", on_change=_run_after_enter)
 
     final_df = st.session_state.get("final_df")
 
@@ -30,6 +37,27 @@ def main():
 
     #if chart is not None:
         #st.altair_chart(chart, use_container_width=False)
+
+def customize() -> pd.DataFrame:
+    w_gap = int(st.session_state.get("w_gaps", 33))
+    w_ind = int(st.session_state.get("w_inds", 33))
+    w_des = int(st.session_state.get("w_desc", 33))
+
+    total = w_gap + w_ind + w_des
+    if total == 0:
+        coef_a = coef_b = coef_c = 1 / 3
+    else:
+        coef_a = w_gap / total
+        coef_b = w_ind / total
+        coef_c = w_des / total
+
+    distance_g = pd.read_parquet('./data/v0_3_1-stock_gaps.parquet', engine='pyarrow')
+    distance_i = pd.read_parquet('./data/v0_3_2-stock_inds.parquet', engine='pyarrow')
+    distance_d = pd.read_parquet('./data/v0_3_3-stock_desc.parquet', engine='pyarrow')
+
+    mix_distance = (coef_a * distance_g) + (coef_b * distance_i) + (coef_c * distance_d)
+
+    return mix_distance
 
 def _run_after_enter():
     ticker = (st.session_state.get("ticker") or "").strip().upper()
@@ -82,6 +110,10 @@ def _run_after_enter():
                 pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
                 distance = pd.read_parquet('./data/v0_2_4-stock.parquet', engine='pyarrow')
+            case "v0.3.0: Customizable":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = customize()
             case _:
                 st.error(f"Unknown data_source: {data_source}")
                 return
