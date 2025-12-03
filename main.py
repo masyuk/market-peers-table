@@ -135,7 +135,7 @@ def _run_after_enter():
             case "Grok: SentenceTransformer":
                 pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
-                distance = pd.read_parquet('./data/v0_4_1c-grok-stock.parquet, engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_4_1c-grok-stock.parquet', engine='pyarrow')
             case "Gpt: TfidfVectorizer":
                 pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
