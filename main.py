@@ -10,20 +10,20 @@ def main():
     p1.text_input("Enter your ticker", key="ticker", on_change=_run_after_enter)
     p2.number_input("Enter depth", min_value=1, max_value=50, value=20, step=5, on_change=_run_after_enter, key="dept")
     p3.selectbox("Data source", [
-        # "v0.1.0: All fields", 
-        # "v0.1.0: All fields (+etf)",
-        # "v0.1.1: Description only", 
-        "Yahoo: CountVectorize", 
-        # "v0.1.2: No description",
-        # "v0.2.0: All fields", 
-        # "v0.2.1: Description only",
-        "Yahoo: TfidfVectorizer",
-        # "v0.2.2: No description",
-        # "v0.2.3: Gaps only",
-        # "v0.2.4: No gap, No Desc.",
-        # "v0.2.5: Customizable",
-        # "v0.4.1e: Desc - deep learning",
-        # "v0.5.1: Google",
+        "v0.1.0: All fields", 
+        "v0.1.0: All fields (+etf)",
+        "v0.1.1: Description only", 
+        # "Yahoo: CountVectorize", 
+        "v0.1.2: No description",
+        "v0.2.0: All fields", 
+        "v0.2.1: Description only",
+        # "Yahoo: TfidfVectorizer",
+        "v0.2.2: No description",
+        "v0.2.3: Gaps only",
+        "v0.2.4: No gap, No Desc.",
+        "v0.2.5: Customizable",
+        "v0.4.1e: Desc - deep learning",
+        "v0.5.1: Google",
         "Grok: TfidfVectorizer",
         "Grok: SentenceTransformer",
         "Gpt: TfidfVectorizer",
@@ -90,8 +90,8 @@ def _run_after_enter():
                 pearson = pd.read_parquet('./data/pirson_all.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_all.parquet', engine='pyarrow')
                 distance = pd.read_parquet('./data/v0_1_0-all.parquet', engine='pyarrow')
-            # case "v0.1.1: Description only":
-            case "Yahoo: CountVectorize":
+            case "v0.1.1: Description only":
+            # case "Yahoo: CountVectorize":
                 pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
                 distance = pd.read_parquet('./data/v0_1_1-stock.parquet', engine='pyarrow')
@@ -103,8 +103,8 @@ def _run_after_enter():
                 pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
                 distance = pd.read_parquet('./data/v0_2_0-stock.parquet', engine='pyarrow')
-            # case "v0.2.1: Description only":
-            case "Yahoo: TfidfVectorizer":
+            case "v0.2.1: Description only":
+            # case "Yahoo: TfidfVectorizer":
                 pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
                 distance = pd.read_parquet('./data/v0_2_1-stock.parquet', engine='pyarrow')
