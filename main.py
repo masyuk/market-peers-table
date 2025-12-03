@@ -11,15 +11,21 @@ def main():
     p2.number_input("Enter depth", min_value=1, max_value=50, value=20, step=5, on_change=_run_after_enter, key="dept")
     p3.selectbox("Data source", [
         "v0.1.0: All fields", 
-        "v0.1.0: All fields (+etf)",
+        # "v0.1.0: All fields (+etf)",
         "v0.1.1: Description only", 
-        "v0.1.2: No description",
-        "v0.2.0: All fields", 
+        # "v0.1.2: No description",
+        # "v0.2.0: All fields", 
         "v0.2.1: Description only",
-        "v0.2.2: No description",
-        "v0.2.3: Gaps only",
-        "v0.2.4: No gap, No Desc.",
-        "v0.3.0: Customizable"
+        # "v0.2.2: No description",
+        # "v0.2.3: Gaps only",
+        # "v0.2.4: No gap, No Desc.",
+        # "v0.2.5: Customizable",
+        # "v0.4.1e: Desc - deep learning",
+        # "v0.5.1: Google",
+        "Grok: TfidfVectorizer",
+        "Grok: SentenceTransformer",
+        "Gpt: TfidfVectorizer",
+        "Gpt: SentenceTransformer",
     ], key="data_source", on_change=_run_after_enter)
     
     if st.session_state.get("data_source") == "v0.3.0: Customizable":
@@ -110,10 +116,35 @@ def _run_after_enter():
                 pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
                 distance = pd.read_parquet('./data/v0_2_4-stock.parquet', engine='pyarrow')
-            case "v0.3.0: Customizable":
+            case "v0.2.5: Customizable":
                 pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
                 sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
                 distance = customize()
+            case "v0.4.1e: Desc - deep learning":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_4_1e-stock.parquet', engine='pyarrow')
+            case "v0.5.1: Google":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_5_1c-stock.parquet', engine='pyarrow')
+            case "Grok: TfidfVectorizer":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_2_1-2-grok-stock.parquet', engine='pyarrow')
+            case "Grok: SentenceTransformer":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_4_1c-grok-stock.parquet, engine='pyarrow')
+            case "Gpt: TfidfVectorizer":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_2_1-2-gpt-stock.parquet', engine='pyarrow')
+            case "Gpt: SentenceTransformer":
+                pearson = pd.read_parquet('./data/pirson_stock.parquet', engine='pyarrow')
+                sorter = pd.read_parquet('./data/ticker_stock.parquet', engine='pyarrow')
+                distance = pd.read_parquet('./data/v0_4_1c-gpt-stock.parquet', engine='pyarrow')
+            
             case _:
                 st.error(f"Unknown data_source: {data_source}")
                 return
